@@ -9,16 +9,22 @@
 package helloworld;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 import java.sql.ResultSet;
 
 public class HelloWorld {
 
     public static void main(String[] args) {
 
+        custoDeUmActivo();
+        return;
+
+        /*
         String jdbcURL = "jdbc:postgresql://10.62.73.22:5432/l3d40";
         String username = "l3d40";
         String password = "banana";
@@ -26,7 +32,7 @@ public class HelloWorld {
         Connection connection = null;
         Statement statement = null;
         ResultSet result = null;
-
+        
         try {
             // Step 2 -  Connecting to the Database
             connection = DriverManager.getConnection(jdbcURL, username, password);
@@ -61,41 +67,65 @@ public class HelloWorld {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
-    private void custoDeUmActivo() {
-        final String dtaquisicaoQuery = "select dtaquisicao from activo where activo=?;";
+    public static void custoDeUmActivo() {
+        
+        final String dtaquisicaoQuery = "select * from activo where id=?;";
         final String valorComercialQuery = "select valor from vcomercial where activo=? and dtvcomercial=?;";
         final String valorDasIntervencoesQuery = "select valcusto from intervencao where activo=? and dtvcomercial=?;";
         
+        String jdbcURL = "jdbc:postgresql://10.62.73.22:5432/l3d40";
+        String username = "l3d40";
+        String password = "banana";
+
+        Connection conn = null;
+        Statement statement = null;
+        ResultSet result = null;
+
         try {
-            Connection conn = getCon();
+            // Step 2 -  Connecting to the Database
+            conn = DriverManager.getConnection(jdbcURL, username, password);
+
             PreparedStatement dtaquisicaoPS = conn.prepareStatement(dtaquisicaoQuery);
             
             System.out.println("Id do activo: ");
-            java.util.Scanner scanner = new Scanner(System.in);
+            Scanner scanner = new Scanner(System.in);
             String id = scanner.nextLine();
             dtaquisicaoPS.setString(1, id);
-            Date dtvComercial = dtaquisicaoPS.executeQuery().getDate("dtvcomercial");
+            String dtvComercial = dtaquisicaoPS.executeQuery().getString("dtaquisicao");
+            result.getDate(0);
 
             PreparedStatement valorComercialPS = conn.prepareStatement(valorComercialQuery);
             valorComercialPS.setString(1, id);
-            valorComercialPS.setDate(2, dtvComercial);
+            valorComercialPS.setString(2, dtvComercial);
             int valorComercial = valorComercialPS.executeQuery().getInt("valor");
             
             
             PreparedStatement intervencoesPS = conn.prepareStatement(valorDasIntervencoesQuery);
             intervencoesPS.setString(1, id);
-            ResultSet result = intervencoesPS.executeQuery(); 
+            result = intervencoesPS.executeQuery(); 
             int valorIntervencoes = 0;
             while (result.next()) {
                 valorIntervencoes += result.getInt("valcusto");
             }
             int total = valorComercial + valorIntervencoes;
             System.out.println("O activo tem um valor de: " + total + "€");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Step 5 Close connection
+            try {
+                // free the resources of the ResultSet
+                if (result != null) result.close();
+                // free the resources of the Statement
+                if (statement != null) statement.close();
+                // close connection
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        
-        catch(SQLException err){
-            //Nothing to do. The option was not a valid one. Read another.
-        }
+    }
 }

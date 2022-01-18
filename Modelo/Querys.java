@@ -1,4 +1,4 @@
-package Modelo;
+/*package Modelo;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -81,7 +81,7 @@ public class Querys {
             System.out.print("Inserir dtaquisicao do activo: ");
             String dtaquisicao = key.nextLine();
             pstmt.setDate(4, date(dtaquisicao));
-*/
+
             
             System.out.print("Inserir modelo do activo: ");
             String modelo = key.nextLine();
@@ -227,3 +227,4 @@ public class Querys {
         }
     }
 }
+*/
